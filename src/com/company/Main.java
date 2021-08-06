@@ -71,15 +71,15 @@ class TreeLeaf extends Tree {
 
 abstract class TreeVis
 {
-    public abstract int getResult();
+    public abstract long getResult();
     public abstract void visitNode(TreeNode node);
     public abstract void visitLeaf(TreeLeaf leaf);
 
 }
 
 class SumInLeavesVisitor extends TreeVis {
-    int result = 0;
-    public int getResult() {
+    long result = 0;
+    public long getResult() {
         return result;
     }
 
@@ -95,7 +95,7 @@ class SumInLeavesVisitor extends TreeVis {
 class ProductOfRedNodesVisitor extends TreeVis {
     long result = 1;
     private final int M = 1000000007;
-    public int getResult() {
+    public long getResult() {
         return (int) result;
     }
 
@@ -112,9 +112,9 @@ class ProductOfRedNodesVisitor extends TreeVis {
 
 class FancyVisitor extends TreeVis {
 
-    int sum_depth = 0;
-    int sum_green = 0;
-    public int getResult() {
+    long sum_depth = 0;
+    long sum_green = 0;
+    public long getResult() {
         //implement this
         return Math.abs(sum_depth - sum_green);
         //return Math.abs(sum_depth);
@@ -154,37 +154,35 @@ public class Main {
 
     private static int [] nodes_val;
     private static int[] colors;
-    private static String[] edges;
-    private static int [] neighbors_count;
+    private static HashMap<Integer, HashSet<Integer>> neighbors;
 
     public static Tree solve() {
         Scanner sc = new Scanner(System.in);
         int n = Integer.parseInt(sc.nextLine());
         nodes_val = new int[n];
         colors = new int[n];
-        edges = new String[n - 1];
-        neighbors_count = new int[n];
+        neighbors = new HashMap<>();
 
         for (int i = 0; i < nodes_val.length; i++)
             nodes_val[i] = sc.nextInt();
         for (int i = 0; i < nodes_val.length; i++)
             colors[i] = sc.nextInt();
-        for (int i = 0; i < edges.length; i++)
-            edges[i] = sc.nextInt() + " " + sc.nextInt();
-
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n - 1; i++)
         {
-            for (String edge : edges)
+            int a = sc.nextInt();
+            int b = sc.nextInt();
+            if(!neighbors.containsKey(a))
             {
-                if(Integer.parseInt(edge.split(" ")[0]) == i + 1 || Integer.parseInt(edge.split(" ")[1]) == i + 1)
-                {
-                    neighbors_count[i]++;
-                }
+                neighbors.put(a, new HashSet<Integer>());
             }
+            neighbors.get(a).add(b);
+            if(!neighbors.containsKey(b))
+            {
+                neighbors.put(b, new HashSet<Integer>());
+            }
+            neighbors.get(b).add(a);
         }
-
-        //for (int i = 0; i < n; i++)
-        //    System.out.println((i + 1) +" "+ neighbors_count[i]);
+        //System.out.println(neighbors);
 
 
         TreeNode root = new TreeNode(nodes_val[0], colors[0] == 0 ? Color.RED : Color.GREEN, 0);
@@ -201,61 +199,32 @@ public class Main {
         Tree current_tree;
         boolean is_node;
 
-        for(int i =0; i<edges.length; i++)
+        for(int child_number: neighbors.get(number))
         {
             is_node = false;
-            int child_number;
-            if (!edges[i].equals("") && Integer.parseInt(edges[i].split(" ")[0]) == number)
+
+            if(neighbors.get(child_number).size() > 1)
+                is_node = true;
+
+            if(is_node)
             {
-                child_number = Integer.parseInt(edges[i].split(" ")[1]);
-                edges[i] = "";
-                if(neighbors_count[child_number - 1] > 1)
-                    is_node = true;
-
-                if(is_node)
-                {
-                    current_tree = new TreeNode(nodes_val[child_number - 1], colors[child_number-1] == 0 ? Color.RED : Color.GREEN, root.getDepth() + 1);
-                    Create_tree((TreeNode)current_tree, child_number);
-                }
-                else
-                {
-                    current_tree = new TreeLeaf(nodes_val[child_number - 1], colors[child_number-1] == 0 ? Color.RED : Color.GREEN, root.getDepth() + 1);
-                }
-                root.addChild(current_tree);
+                current_tree = new TreeNode(nodes_val[child_number - 1], colors[child_number-1] == 0 ? Color.RED : Color.GREEN, root.getDepth() + 1);
+                neighbors.get(child_number).remove(number);
+                Create_tree((TreeNode)current_tree, child_number);
             }
-        }
-
-        for(int i =0; i<edges.length; i++)
-        {
-            is_node = false;
-            int child_number;
-            if (!edges[i].equals("") && Integer.parseInt(edges[i].split(" ")[1]) == number)
+            else
             {
-                child_number = Integer.parseInt(edges[i].split(" ")[0]);
-                edges[i] = "";
-                if(neighbors_count[child_number - 1] > 1)
-                    is_node = true;
-
-                if(is_node)
-                {
-                    current_tree = new TreeNode(nodes_val[child_number - 1], colors[child_number-1] == 0 ? Color.RED : Color.GREEN, root.getDepth() + 1);
-                    Create_tree((TreeNode)current_tree, child_number);
-                }
-                else
-                {
-                    current_tree = new TreeLeaf(nodes_val[child_number - 1], colors[child_number-1] == 0 ? Color.RED : Color.GREEN, root.getDepth() + 1);
-                }
-                root.addChild(current_tree);
+                current_tree = new TreeLeaf(nodes_val[child_number - 1], colors[child_number-1] == 0 ? Color.RED : Color.GREEN, root.getDepth() + 1);
             }
-        }
+            root.addChild(current_tree);
 
+
+        }
     }
 
 
-
-
     public static void main(String[] args) {
-
+        //long m = System.currentTimeMillis();
 
         Tree root = solve();
         SumInLeavesVisitor vis1 = new SumInLeavesVisitor();
@@ -266,13 +235,16 @@ public class Main {
         root.accept(vis2);
         root.accept(vis3);
 
-        int res1 = vis1.getResult();
-        int res2 = vis2.getResult();
-        int res3 = vis3.getResult();
+        long res1 = vis1.getResult();
+        long res2 = vis2.getResult();
+        long res3 = vis3.getResult();
 
         System.out.println(res1);
         System.out.println(res2);
         System.out.println(res3);
 
+        //print_tree(root, "");
+        //System.out.println(neighbors);
+        //System.out.println((double) (System.currentTimeMillis() - m)/1000);
     }
 }

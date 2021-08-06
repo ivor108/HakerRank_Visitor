@@ -253,84 +253,6 @@ public class Main {
 
 
 
-/*
-    private static int [] values;
-    private static Color [] colors;
-    private static HashMap<Integer, HashSet<Integer>> map;
-
-    public static Tree solve() {
-
-        Scanner sc = new Scanner(System.in);
-        int n = Integer.parseInt(sc.nextLine());
-
-        values = new int[n];
-        colors = new Color[n];
-        map = new HashMap<>(n);
-
-
-        for (int i = 0; i < values.length; i++)
-            values[i] = sc.nextInt();
-        for (int i = 0; i < values.length; i++)
-            colors[i] = sc.nextInt() == 0 ? Color.RED : Color.GREEN;
-
-        for (int i = 0; i < n - 1; i++) {
-            int u = sc.nextInt();
-            int v = sc.nextInt();
-
-            HashSet<Integer> uNeighbors = map.get(u);
-            if (uNeighbors == null) {
-                uNeighbors = new HashSet<>();
-                map.put(u, uNeighbors);
-            }
-            uNeighbors.add(v);
-
-
-            HashSet<Integer> vNeighbors = map.get(v);
-
-            if (vNeighbors == null) {
-                vNeighbors = new HashSet<>();
-                map.put(v, vNeighbors);
-            }
-            vNeighbors.add(u);
-        }
-
-        sc.close();
-
-        TreeNode root = new TreeNode(values[0], colors[0], 0);
-        if (n == 1) {
-            return root;
-        }
-        Create_tree(root, 1);
-        return root;
-    }
-
-
-    public static void Create_tree(TreeNode root, Integer number)
-    {
-        for (Integer child : map.get(number))
-        {
-            map.get(child).remove(number);
-
-            HashSet<Integer> grandChildren = map.get(child);
-            boolean is_node = (grandChildren != null && !grandChildren.isEmpty());
-
-            Tree current_tree;
-            if (is_node) {
-                current_tree = new TreeNode(values[child - 1], colors[child - 1], root.getDepth() + 1);
-            } else {
-                current_tree = new TreeLeaf(values[child - 1], colors[child - 1], root.getDepth() + 1);
-            }
-            root.addChild(current_tree);
-
-            if(current_tree instanceof TreeNode)
-            {
-                Create_tree( (TreeNode)current_tree, child);
-            }
-
-
-        }
-    }
-*/
 
     public static void main(String[] args) {
 
@@ -351,15 +273,6 @@ public class Main {
         System.out.println(res1);
         System.out.println(res2);
         System.out.println(res3);
-
-
-        //Tree root = solve();
-        //print_tree(root, "");
-
-        //System.out.println(((TreeNode)((TreeNode) root).getChildren().get(1)).getColor());
-
-        //for (int i = 0; i < values.length; i++)
-        //    System.out.println((i + 1) + " " + values[i]);
 
     }
 }
